@@ -35,6 +35,9 @@ Total: 73 testes automatizados (`pytest`) passando.
 Observação: o vídeo veio em VP9. A partir deste teste, quando houver H.264 na mesma resolução, ele é preferido
 (compatibilidade com o app Fotos e editores); se só houver VP9, o arquivo original é entregue.
 
+Decisão do responsável (17/11/2026): seguir para publicação sem testar foto, carrossel misto e Threads.
+Esses recursos estão **implementados, mas não validados com conteúdo real**; falhas aparecem como mensagem de erro na tela.
+
 ## Simulado
 
 - Estrutura dos dados do Instagram e do Threads: os testes de parsing usam JSON **sintético**, montado a partir da
