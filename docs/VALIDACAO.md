@@ -19,6 +19,10 @@ Data: 17/11/2026. Este registro separa o que foi **testado de verdade** do que f
 
 Total: 73 testes automatizados (`pytest`) passando.
 
+### No GitHub Actions
+
+| O quê | Como | Resultado |
+|---|---|---|
 | Build da imagem Docker | GitHub Actions (PR #1): build, contêiner somente leitura, `/healthz`, `/api/session`, FFmpeg presente | ok |
 | Testes no CI | GitHub Actions, Ubuntu + Python 3.13 + FFmpeg | 73 passando, lint ok |
 
