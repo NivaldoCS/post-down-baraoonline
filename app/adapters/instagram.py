@@ -262,6 +262,8 @@ def ytdlp_download(info: dict[str, Any], dest_dir: Path, base_name: str, *, max_
     opts: dict[str, Any] = {
         "quiet": True, "no_warnings": True, "noprogress": True,
         "format": YTDLP_VIDEO_FORMAT, "merge_output_format": "mp4",
+        # Maior resolução primeiro; empatando, H.264/AAC (abre no app Fotos e em editores) em vez de VP9.
+        "format_sort": ["res", "vcodec:h264", "acodec:aac"],
         "outtmpl": str(dest_dir / f"{base_name}.%(ext)s"),
         "max_filesize": max_bytes, "socket_timeout": min(timeout, 60),
         "overwrites": True, "noplaylist": True, "cachedir": False, "retries": 2, "fragment_retries": 2,

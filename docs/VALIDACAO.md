@@ -26,6 +26,15 @@ Total: 73 testes automatizados (`pytest`) passando.
 | Build da imagem Docker | GitHub Actions (PR #1): build, contêiner somente leitura, `/healthz`, `/api/session`, FFmpeg presente | ok |
 | Testes no CI | GitHub Actions, Ubuntu + Python 3.13 + FFmpeg | 73 passando, lint ok |
 
+## Teste real (17/11/2026, ambiente de nuvem com domínios liberados)
+
+| Conteúdo | Resultado |
+|---|---|
+| Reel público do Instagram (@piauinoticias) | ✅ 1 vídeo extraído em ~2 s via yt-dlp; MP4 720×1280, áudio AAC, 49 s, 13,1 MB (medido no arquivo). 720p era a maior versão oferecida. Vídeo + áudio unidos sem recompressão. Legenda veio vazia (post sem legenda ou limitação do acesso sem login — não confirmado). |
+
+Observação: o vídeo veio em VP9. A partir deste teste, quando houver H.264 na mesma resolução, ele é preferido
+(compatibilidade com o app Fotos e editores); se só houver VP9, o arquivo original é entregue.
+
 ## Simulado
 
 - Estrutura dos dados do Instagram e do Threads: os testes de parsing usam JSON **sintético**, montado a partir da
@@ -34,7 +43,7 @@ Total: 73 testes automatizados (`pytest`) passando.
 
 ## NÃO testado (pendente — precisa ser feito por você)
 
-1. **Extração real do Instagram e do Threads.** O ambiente de nuvem usado no desenvolvimento bloqueia
+1. **Extração real: foto, carrossel misto do Instagram e post do Threads** (Reel já validado). O ambiente de nuvem usado no desenvolvimento bloqueia
    `instagram.com`, `threads.com` e os CDNs (erro 403 do proxy de rede da sessão — não é resposta da Meta).
    Execute `scripts/validar_extracao.py` com um Reel, uma foto, um carrossel misto do Instagram e um post do Threads.
 2. **Teste na hospedagem** (o IP do servidor pode ser limitado pelo Instagram).
