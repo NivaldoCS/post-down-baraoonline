@@ -19,6 +19,9 @@ Data: 17/11/2026. Este registro separa o que foi **testado de verdade** do que f
 
 Total: 73 testes automatizados (`pytest`) passando.
 
+| Build da imagem Docker | GitHub Actions (PR #1): build, contêiner somente leitura, `/healthz`, `/api/session`, FFmpeg presente | ok |
+| Testes no CI | GitHub Actions, Ubuntu + Python 3.13 + FFmpeg | 73 passando, lint ok |
+
 ## Simulado
 
 - Estrutura dos dados do Instagram e do Threads: os testes de parsing usam JSON **sintético**, montado a partir da
@@ -30,9 +33,7 @@ Total: 73 testes automatizados (`pytest`) passando.
 1. **Extração real do Instagram e do Threads.** O ambiente de nuvem usado no desenvolvimento bloqueia
    `instagram.com`, `threads.com` e os CDNs (erro 403 do proxy de rede da sessão — não é resposta da Meta).
    Execute `scripts/validar_extracao.py` com um Reel, uma foto, um carrossel misto do Instagram e um post do Threads.
-2. **Build da imagem Docker.** O Docker Hub também estava bloqueado. O workflow do GitHub Actions
-   (`.github/workflows/ci.yml`) faz o build e testa o contêiner a cada push — confira se passou.
-3. **Teste na hospedagem** (o IP do servidor pode ser limitado pelo Instagram).
-4. **Safari em iPhone real**: baixar, abrir em Arquivos e o botão Compartilhar.
+2. **Teste na hospedagem** (o IP do servidor pode ser limitado pelo Instagram).
+3. **Safari em iPhone real**: baixar, abrir em Arquivos e o botão Compartilhar.
 
 Ao concluir, anote aqui a data, os links (ou só o tipo de publicação) e o `relatorio.json` gerado.
