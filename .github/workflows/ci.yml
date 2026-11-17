@@ -1,0 +1,40 @@
+# Verificações automáticas (testes simulados). NÃO é servidor de downloads.
+name: verificacoes
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  testes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: FFmpeg
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends ffmpeg
+      - name: Dependências
+        run: pip install -r requirements-dev.txt
+      - name: Lint
+        run: ruff check app tests scripts
+      - name: Testes
+        run: pytest -q
+  docker:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build da imagem
+        run: docker build -t post-down:ci .
+      - name: Sobe o contêiner e testa /healthz
+        run: |
+          docker run -d --name pd -e APP_PASSWORD_HASH='scrypt$32768$8$1$AAAAAAAAAAAAAAAAAAAAAA$AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' \
+            -e SESSION_SECRET=ci-secret-ci-secret-ci-secret-ci-secret -e COOKIE_SECURE=false \
+            --read-only --tmpfs /tmp --tmpfs /data/tmp:uid=10001,gid=10001 -p 8000:8000 post-down:ci
+          for i in $(seq 1 20); do curl -fsS localhost:8000/healthz && break; sleep 1; done
+          curl -fsS localhost:8000/api/session
+          docker exec pd ffmpeg -version | head -1
+          docker logs pd
