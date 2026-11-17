@@ -1,0 +1,51 @@
+# Uso:
+#   cp .env.example .env   (preencha os valores no servidor)
+#   docker compose up -d --build
+# O Caddy obtém o certificado HTTPS do domínio em DOMAIN automaticamente.
+services:
+  app:
+    build: .
+    env_file: .env
+    environment:
+      TEMP_DIR: /data/tmp
+      FORWARDED_ALLOW_IPS: "*"   # só o Caddy alcança a porta 8000 (rede interna)
+    read_only: true
+    tmpfs:
+      - /tmp:size=64m
+    volumes:
+      - media-tmp:/data/tmp
+      # Opcional: cookies de conta secundária (ver README). Descomente se usar.
+      # - ./secrets/instagram_cookies.txt:/run/secrets/instagram_cookies.txt:ro
+    expose:
+      - "8000"
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    cap_drop: [ALL]
+    deploy:
+      resources:
+        limits:
+          memory: 1g
+    logging:
+      driver: local
+      options:
+        max-size: 10m
+
+  caddy:
+    image: caddy:2-alpine
+    depends_on: [app]
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      DOMAIN: ${DOMAIN:?defina DOMAIN no .env}
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    restart: unless-stopped
+
+volumes:
+  media-tmp:
+  caddy-data:
+  caddy-config:

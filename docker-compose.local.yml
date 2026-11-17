@@ -1,0 +1,15 @@
+# Teste local sem domínio/HTTPS:  docker compose -f docker-compose.local.yml up --build
+# Acesse http://localhost:8000  (exige COOKIE_SECURE=false no .env)
+services:
+  app:
+    build: .
+    env_file: .env
+    environment:
+      TEMP_DIR: /data/tmp
+      COOKIE_SECURE: "false"
+    read_only: true
+    tmpfs:
+      - /tmp:size=64m
+      - /data/tmp:size=1g,uid=10001,gid=10001
+    ports:
+      - "127.0.0.1:8000:8000"
