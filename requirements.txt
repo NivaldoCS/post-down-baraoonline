@@ -1,0 +1,8 @@
+# Servidor
+fastapi==0.163.1
+uvicorn[standard]==0.54.0
+httpx==0.28.1
+# Extratores — atualize com frequência (ver README, "Atualizar extratores")
+yt-dlp[default,curl-cffi]==2026.10.26
+curl_cffi==0.17.0
+instaloader==4.16

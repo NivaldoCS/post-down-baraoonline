@@ -1,0 +1,26 @@
+# Segredos e configuração local — nunca versionar
+.env
+.env.*
+!.env.example
+secrets/
+*.cookies.txt
+cookies*.txt
+*.session
+session-*
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+
+# Temporários de mídia
+/tmp/
+data/
+*.part
+*.mp4
+*.m4a
+*.zip
+validacao_*/
