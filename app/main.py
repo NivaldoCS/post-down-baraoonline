@@ -69,7 +69,8 @@ def create_app(settings: Settings | None = None, adapters=None) -> FastAPI:
                   openapi_url=None, lifespan=lifespan)
     app.state.settings, app.state.jobs, app.state.sessions = settings, jobs, sessions
     if settings.trusted_hosts:
-        app.add_middleware(TrustedHostMiddleware, allowed_hosts=settings.trusted_hosts)
+        # 127.0.0.1/localhost: verificação de saúde feita de dentro do contêiner.
+        app.add_middleware(TrustedHostMiddleware, allowed_hosts=[*settings.trusted_hosts, "127.0.0.1", "localhost"])
 
     @app.middleware("http")
     async def security_headers(request: Request, call_next):

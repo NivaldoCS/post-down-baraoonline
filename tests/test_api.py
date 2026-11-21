@@ -151,3 +151,17 @@ def test_download_media_rejects_non_cdn(tmp_path):
 
     with pytest.raises(ExtractionError):
         download_media("https://example.com/a.jpg", tmp_path / "a.jpg", max_bytes=10, timeout=5)
+
+
+def test_trusted_hosts_allow_healthcheck(settings, fake_adapter):
+    from dataclasses import replace
+
+    from fastapi.testclient import TestClient
+
+    from app.main import create_app
+
+    app = create_app(replace(settings, trusted_hosts=["postdown.exemplo.com"]), adapters={"instagram": fake_adapter})
+    with TestClient(app, base_url="http://127.0.0.1:8000") as c:
+        assert c.get("/healthz").status_code == 200
+    with TestClient(app, base_url="http://evil.example") as c:
+        assert c.get("/healthz").status_code == 400
