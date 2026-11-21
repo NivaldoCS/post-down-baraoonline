@@ -167,3 +167,31 @@ def test_ytdlp_respects_max_duration(tmp_path):
     with pytest.raises(ExtractionError) as e:
         instagram.ytdlp_download({"formats": [], "duration": 5000}, tmp_path, "x", max_bytes=1, timeout=5, max_duration=60)
     assert e.value.code == "TOO_LONG"
+
+
+def test_ytdlp_prefers_h264_over_vp9_at_same_resolution(local_media_server, tmp_path, monkeypatch, media_dir):
+    """Mesma resolução em VP9 e H.264: deve escolher H.264. Resolução maior continua vencendo."""
+    import shutil
+
+    monkeypatch.setattr(instagram, "check_media_url", lambda u: u)
+    vp9 = media_dir / "vp9_only.webm"
+    if not vp9.exists():
+        subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-f", "lavfi", "-i", "testsrc=size=1080x1920:rate=30",
+                        "-t", "1", "-c:v", "libvpx-vp9", "-b:v", "200k", "-an", str(vp9)], check=True)
+    shutil.copy(media_dir / "video_only.mp4", media_dir / "h264_only.mp4")
+    info = {
+        "id": "T2", "title": "T2", "extractor": "instagram", "extractor_key": "Instagram",
+        "webpage_url": "https://www.instagram.com/p/T2/", "duration": 1,
+        "formats": [
+            {"format_id": "dash-vp9", "url": f"{local_media_server}/vp9_only.webm", "ext": "webm", "width": 1080,
+             "height": 1920, "vcodec": "vp09.00.40.08", "acodec": "none", "protocol": "http"},
+            {"format_id": "dash-h264", "url": f"{local_media_server}/h264_only.mp4", "ext": "mp4", "width": 1080,
+             "height": 1920, "vcodec": "avc1.640028", "acodec": "none", "protocol": "http"},
+            {"format_id": "dash-audio", "url": f"{local_media_server}/audio_only.m4a", "ext": "m4a",
+             "vcodec": "none", "acodec": "mp4a.40.2", "protocol": "http"},
+        ],
+    }
+    out = instagram.ytdlp_download(info, tmp_path, "item_01", max_bytes=50 * 1024 * 1024, timeout=60)
+    streams = json.loads(subprocess.run(["ffprobe", "-v", "error", "-print_format", "json", "-show_streams", str(out)],
+                                        capture_output=True, check=True).stdout)["streams"]
+    assert {s["codec_type"]: s["codec_name"] for s in streams} == {"video": "h264", "audio": "aac"}
